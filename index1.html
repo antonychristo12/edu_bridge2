@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EduBridge</title>
+<style>
+:root{--ink:#14213d;--mut:#5b6785;--bg:#f3f6fb;--card:#fff;--line:#dfe5f1;--pri:#2b4eff;--pri-d:#1f3bd1;--amb:#ffb627;--ok:#12a594;--bad:#d64545}
+*{box-sizing:border-box;margin:0}
+body{font-family:ui-rounded,"Avenir Next","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;padding-bottom:76px}
+h1,h2,h3{letter-spacing:-.02em;line-height:1.2}
+h2{font-size:1.5rem;margin-bottom:14px}h3{font-size:1.05rem;margin-bottom:8px}
+.mut{color:var(--mut)}.sm{font-size:.85rem}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amb);outline-offset:2px}
+.wrap{max-width:960px;margin:0 auto;padding:16px}
+header{background:var(--ink);color:#fff}
+header .wrap{display:flex;align-items:center;justify-content:space-between;padding:12px 16px}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:1.15rem;letter-spacing:-.02em}
+.brand svg{width:28px;height:28px}
+.who{display:flex;align-items:center;gap:12px;font-size:.9rem}
+.link{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer}
+.nav{display:flex;gap:4px;background:#fff;border-bottom:1px solid var(--line);overflow-x:auto}
+.nav button{flex:1 0 auto;background:none;border:0;padding:12px 16px;cursor:pointer;color:var(--mut);font-weight:600;border-bottom:3px solid transparent}
+.nav button.on{color:var(--pri);border-bottom-color:var(--pri)}
+@media(max-width:700px){.nav{position:fixed;bottom:0;left:0;right:0;z-index:5;border-top:1px solid var(--line);border-bottom:0;overflow:visible}.nav button{flex:1;padding:12px 2px;font-size:.72rem;border-bottom:0;border-top:3px solid transparent}.nav button.on{border-top-color:var(--pri)}.who span{display:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.between{justify-content:space-between}
+.btn{background:var(--pri);color:#fff;border:0;border-radius:10px;padding:10px 18px;font-weight:700;cursor:pointer}
+.btn:hover{background:var(--pri-d)}.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--pri);border:1.5px solid var(--pri)}
+.btn.ghost:hover{background:#eef1ff}.btn.sm{padding:6px 12px;font-size:.85rem}.btn.bad{color:var(--bad);border-color:var(--bad)}
+label{display:block;font-weight:600;font-size:.9rem;margin-bottom:12px}
+input,select,textarea{width:100%;margin-top:4px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:var(--pri);outline:0}
+.err{color:var(--bad);font-size:.9rem;min-height:1.3em;margin-bottom:6px}
+.okmsg{color:#0b7568;font-size:.9rem;font-weight:600;margin-bottom:10px}
+.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.78rem;font-weight:700;background:#e6e9f3;color:var(--mut)}
+.pill.ok{background:#d9f3ef;color:#0b7568}
+.pill.warn{background:#fff1d6;color:#8a5a00}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pri);border-radius:99px}
+.bar.low i{background:var(--amb)}
+.tile{text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;width:100%}
+.tile:hover{border-color:var(--pri)}
+.tile b{display:block;margin-bottom:2px}
+.login{min-height:100vh;display:grid;place-items:center;padding:16px}
+.login .card{width:100%;max-width:420px;padding:28px}
+.hint{font-size:.82rem;color:var(--mut);margin-top:12px}
+.hint .link{color:var(--pri)}
+.rules{list-style:none;padding:0;margin:0 0 12px;font-size:.82rem;color:var(--mut);display:grid;gap:2px}
+.rules .ok{color:#0b7568;font-weight:600}
+.hero{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.gauge{width:230px;max-width:100%}.gnum{font-size:30px;font-weight:800;fill:var(--ink)}
+.notice{border-left:4px solid var(--amb);padding:6px 12px;margin-bottom:10px;background:#fffaf0;border-radius:0 8px 8px 0}
+.banner{background:var(--amb);color:var(--ink);text-align:center;padding:8px;font-size:.9rem;font-weight:600}
+#chat{height:min(52vh,420px);overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px}
+.msg{max-width:82%;padding:10px 14px;border-radius:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.ai{background:#eef1ff;align-self:flex-start;border-bottom-left-radius:4px;max-width:92%}
+.msg.me{background:var(--pri);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.code{background:var(--ink);color:#e8edff;border-radius:10px;padding:10px 12px;overflow-x:auto;font:.82rem/1.5 ui-monospace,Menlo,Consolas,monospace;margin:8px 0;white-space:pre}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:5px 12px;font-size:.85rem;cursor:pointer}
+.chip:hover{border-color:var(--pri)}
+.rings{display:flex;gap:24px;flex-wrap:wrap}
+.ring{text-align:center;font-size:.85rem;font-weight:600}.ring svg{width:92px;display:block;margin:0 auto 4px}.ring text{font-size:16px;font-weight:800;fill:var(--ink)}
+.timer{font-size:4.5rem;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums;text-align:center;margin:8px 0}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;font-weight:500}
+.opt:hover{border-color:var(--pri)}.opt.sel{border-color:var(--pri);background:#eef1ff}
+.opt.right{border-color:var(--ok);background:#e6f7f4}.opt.wrong{border-color:var(--bad);background:#fdeeee}
+.tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.tabs button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 16px;font-weight:600;cursor:pointer;color:var(--mut)}
+.tabs button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-weight:600}
+.stat{font-size:2rem;font-weight:800;letter-spacing:-.02em}
+.qb{border:1px dashed var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.qb .o{display:flex;align-items:center;gap:8px;margin-top:6px}
+.qb .o input[type=radio]{width:auto;margin:0}
+.qb .o input[type=text]{margin:0}
+.fbar{position:sticky;top:0;z-index:12;background:var(--amb);color:var(--ink);display:flex;align-items:center;gap:12px;padding:8px 16px;flex-wrap:wrap}
+.fbar .t{font-size:1.4rem;font-weight:800;font-variant-numeric:tabular-nums}
+.fbar .p{flex:1;min-width:80px;height:6px;background:rgba(20,33,61,.2);border-radius:99px;overflow:hidden}
+.fbar .p i{display:block;height:100%;background:var(--ink)}
+.emg{margin-left:auto;background:var(--ink);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer}
+.emg:hover{background:var(--bad)}
+.lesson{line-height:1.7}.lesson>span{display:block;margin-bottom:6px}
+.sheet{position:fixed;inset:0;z-index:22;background:rgba(20,33,61,.85);display:grid;place-items:center;padding:16px}
+.sheet .card{max-width:380px;color:var(--ink);text-align:left;margin:0}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:99px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+#toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" role="status"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const today=()=>new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const ago=t=>{if(!t)return 'Never';const m=Math.floor((Date.now()-t)/6e4);if(m<1)return 'Just now';if(m<60)return m+' min ago';const h=Math.floor(m/60);if(h<24)return h+' h ago';const d=Math.floor(h/24);return d+(d===1?' day ago':' days ago')};
+let qn=0,tick=null;
+const KEY='edubridge-v2';
+/* Admin password is stored only as a salted SHA-256 hash, never as plain text. */
+const AH='31ec6540c68542e0727faa69fd37b4a94d58b94920e714c7de09896b4820c32a';
+/* Optional: URL of your own AI backend. It receives {question, subject} and returns {answer}. */
+const AI_URL='';
+
+/* ---------- SHA-256 (used to store passwords as hashes) ---------- */
+const K=[],H0=[];
+for(let n=2,c=0;c<64;n++){let p=1;for(let d=2;d*d<=n;d++)if(n%d===0){p=0;break}if(p){if(c<8)H0.push((Math.pow(n,.5)%1*4294967296)|0);K.push((Math.pow(n,1/3)%1*4294967296)|0);c++}}
+function sha256(str){
+  const b=new TextEncoder().encode(str),l=b.length,n=((l+9+63)>>6)<<4,w=new Int32Array(n);
+  for(let i=0;i<l;i++)w[i>>2]|=b[i]<<(24-8*(i&3));
+  w[l>>2]|=0x80<<(24-8*(l&3));w[n-1]=l*8;
+  const h=H0.slice(),x=new Int32Array(64),R=(v,k)=>(v>>>k)|(v<<(32-k));
+  for(let o=0;o<n;o+=16){
+    for(let i=0;i<64;i++)x[i]=i<16?w[o+i]:(x[i-16]+(R(x[i-15],7)^R(x[i-15],18)^(x[i-15]>>>3))+x[i-7]+(R(x[i-2],17)^R(x[i-2],19)^(x[i-2]>>>10)))|0;
+    let [a,b2,c,d,e,f,g,hh]=h;
+    for(let i=0;i<64;i++){
+      const t1=(hh+(R(e,6)^R(e,11)^R(e,25))+((e&f)^(~e&g))+K[i]+x[i])|0;
+      const t2=((R(a,2)^R(a,13)^R(a,22))+((a&b2)^(a&c)^(b2&c)))|0;
+      hh=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0;
+    }
+    [a,b2,c,d,e,f,g,hh].forEach((v,i)=>{h[i]=(h[i]+v)|0});
+  }
+  return h.map(v=>(v>>>0).toString(16).padStart(8,'0')).join('');
+}
+
+/* ---------- subjects, quizzes, data ---------- */
+const SUBJ=[['dsa','Data Structures & Algorithms','DSA'],['java','Java','Java'],['math','Mathematics','Maths'],['py','Python','Python'],['db','DBMS','DBMS'],['os','Operating Systems','OS'],['net','Computer Networks','Networks']];
+const sname=id=>(SUBJ.find(s=>s[0]===id)||[0,'General'])[1];
+let DB;
+const Q=(s,t,a)=>({id:++DB.uid,subject:s,title:t,published:true,questions:a.map(([q,o,c])=>({q,o,a:c}))});
+function seed(){
+  DB={users:{},uid:100,quizzes:[],notices:[{id:1,title:'Welcome to EduBridge',body:'Take a quiz in every subject, ask AI Teacher anything and use Focus Mode to study without distractions.',published:true,date:today()}]};
+  DB.quizzes=[
+    Q('dsa','DSA fundamentals',[
+      ['Which structure follows last-in, first-out order?',['Queue','Stack','Heap','Graph'],1],
+      ['Worst-case search time in a BST that has degenerated into a linked list?',['O(1)','O(log n)','O(n)','O(n log n)'],2],
+      ['Allowed balance factors in an AVL tree?',['-1, 0, 1','0 only','-2 to 2','Any integer'],0],
+      ['Which traversal visits a BST in sorted order?',['Preorder','Inorder','Postorder','Level order'],1],
+      ['Merge sort runs in…',['O(n)','O(n log n)','O(n²)','O(log n)'],1]]),
+    Q('dsa','DSA intermediate',[
+      ['Binary search requires the input to be…',['Sorted','Unique','Positive','A linked list'],0],
+      ['BFS tracks nodes with a…',['Stack','Queue','Heap','Set'],1],
+      ["Dijkstra's algorithm fails with…",['Cycles','Negative edge weights','Directed graphs','Sparse graphs'],1],
+      ['The root of a min-heap is the…',['Smallest element','Largest element','Median','Last inserted element'],0],
+      ['Which is NOT a way to handle hash collisions?',['Chaining','Open addressing','Double hashing','Bubble sorting'],3]]),
+    Q('java','Java basics',[
+      ['The JVM runs…',['Java bytecode','Only C code','HTML pages','SQL queries'],0],
+      ['A class declared final cannot be…',['Instantiated','Extended','Imported','Printed'],1],
+      ['Default value of an int instance variable?',['null','0','1','Undefined'],1],
+      ['Strings in Java are…',['Mutable','Immutable','Primitive','Arrays of int'],1],
+      ['Which is the correct main method signature?',['public static void main(String[] args)','void start()','public void run()','static int main()'],0]]),
+    Q('java','OOP and collections',[
+      ['Encapsulation means…',['Bundling data with methods and limiting access','Copying objects','Running code in parallel','Hiding all classes'],0],
+      ['Polymorphism lets you…',['Store many files','Use one interface for many behaviours','Inherit from nothing','Avoid methods'],1],
+      ['Can you instantiate an abstract class directly?',['Yes, always','Only in a loop','Only if empty','No'],3],
+      ['Method overriding happens when a subclass…',['Adds a new field','Redefines a parent method','Deletes a method','Renames the class'],1],
+      ['Which collection stores only unique elements?',['ArrayList','HashSet','LinkedList','Vector'],1]]),
+    Q('math','Algebra and calculus',[
+      ['The derivative of x² is…',['x','2x','x²','2'],1],
+      ['The roots of x² − 5x + 6 = 0 are…',['1 and 6','2 and 3','−2 and −3','5 and 1'],1],
+      ['∫ 2x dx =',['x² + C','2x² + C','x + C','2 + C'],0],
+      ['log₁₀(1000) =',['2','3','10','100'],1],
+      ['sin²θ + cos²θ =',['0','1','2','tan θ'],1]]),
+    Q('math','Probability and discrete maths',[
+      ['Probability of a head in one fair coin toss?',['1/4','1/2','1','0'],1],
+      ['5! =',['25','60','120','720'],2],
+      ['5C2 =',['5','10','20','25'],1],
+      ['Mean of 2, 4, 6, 8?',['4','5','6','8'],1],
+      ['Determinant of [[1, 2], [3, 4]]?',['−2','2','10','−5'],0]]),
+    Q('py','Python essentials',[
+      ['Which Python type is immutable?',['list','dict','tuple','set'],2],
+      ['What does [x * 2 for x in [1, 2, 3]] give?',['[1, 2, 3]','[2, 4, 6]','[1, 4, 9]','An error'],1],
+      ['Which keyword defines a function?',['func','def','function','define'],1],
+      ['Which symbol starts a comment?',['//','#','/*','--'],1],
+      ['What is the type of {}?',['list','set','dict','tuple'],2]]),
+    Q('db','DBMS and SQL',[
+      ['Which SQL command reads rows from a table?',['INSERT','SELECT','DELETE','CREATE'],1],
+      ['A primary key…',['Can be NULL','Uniquely identifies each row','Allows duplicates','Is always text'],1],
+      ['In ACID, the A stands for…',['Availability','Atomicity','Accuracy','Aggregation'],1],
+      ['Which join returns only matching rows from both tables?',['INNER JOIN','LEFT JOIN','FULL JOIN','CROSS JOIN'],0],
+      ['Third normal form removes…',['Transitive dependencies','All keys','Foreign keys','Indexes'],0]]),
+    Q('os','Operating systems',[
+      ['Threads of one process share…',['Memory space','Nothing','CPU registers','Their stack'],0],
+      ['A deadlock happens when processes…',['Finish quickly','Each wait for a resource held by another','Share memory','Use too little CPU'],1],
+      ['Round Robin scheduling uses a…',['Time quantum','Priority only','Shortest job','Random choice'],0],
+      ['Virtual memory lets a program…',['Run with more memory than RAM','Increase CPU speed','Replace the disk','Skip paging'],0],
+      ['A semaphore is used for…',['Process synchronisation','Printing','Compiling','Drawing'],0]]),
+    Q('net','Computer networks',[
+      ['How many layers does the OSI model have?',['5','6','7','4'],2],
+      ['Which protocol is connectionless?',['TCP','UDP','HTTP','FTP'],1],
+      ['DNS translates…',['Domain names to IP addresses','IP addresses to MAC addresses','Files to folders','Passwords to hashes'],0],
+      ['The default port for HTTPS is…',['21','80','443','8080'],2],
+      ['An IPv4 address is…',['16 bits','32 bits','64 bits','128 bits'],1]])
+  ];
+}
+function loadDB(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.users&&d.quizzes)DB=d}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+seed();loadDB();
+
+const S={role:null,auth:Object.keys(DB.users).length?'signin':'signup',err:'',ok:'',pre:'',user:'',view:'dash',adm:'overview',sel:null,rm:null,builder:false,prev:false,demo:null,tsub:'all',lsub:null,ltopic:null,typing:false,emg:false,fmin:25,qz:null,fails:0,lockUntil:0};
+const newUser=(name,un,hash)=>({name,un,hash,created:Date.now(),last:Date.now(),results:[],sessions:[],fa:null,chat:[],asked:0,done:[]});
+
+/* ---------- AI Teacher knowledge: [subject, pattern, topic, answer]. Code blocks use ~~~ ---------- */
+const KB=[
+['dsa',/avl/,'AVL trees',`An AVL tree is a self-balancing binary search tree. For every node, the heights of the left and right subtrees differ by at most 1. When an insert or delete breaks that rule, the tree rotates (left, right, left-right or right-left) to rebalance, so search, insert and delete stay O(log n).`],
+['dsa',/bubble sort/,'Bubble sort',`Bubble sort repeatedly compares neighbouring elements and swaps them when they are in the wrong order. After each pass the largest remaining value moves to the end. It is O(n²), so it is mainly used for learning.
+~~~
+void bubbleSort(int[] a) {
+  for (int i = 0; i < a.length - 1; i++)
+    for (int j = 0; j < a.length - 1 - i; j++)
+      if (a[j] > a[j + 1]) {
+        int t = a[j]; a[j] = a[j + 1]; a[j + 1] = t;
+      }
+}
+~~~`],
+['dsa',/merge ?sort|quick ?sort/,'Merge sort and quick sort',`Merge sort splits the array in half, sorts each half recursively and merges the two sorted halves. It is always O(n log n) but needs O(n) extra space. Quick sort picks a pivot, moves smaller values left and larger values right, then sorts each side. It averages O(n log n) and is O(n²) in the worst case.`],
+['dsa',/\bsort(ing)?\b|selection sort|insertion sort|heap ?sort/,'Sorting',`Bubble, selection and insertion sort are O(n²) and simple. Merge sort and heap sort are O(n log n) in every case. Quick sort is O(n log n) on average and O(n²) in the worst case. Insertion sort is fast on nearly sorted data. Ask about any one of them for details.`],
+['dsa',/binary search/,'Binary search',`Binary search finds a value in a sorted array by checking the middle element and discarding the half that cannot contain it. Each step halves the range, so it runs in O(log n).
+~~~
+int binarySearch(int[] a, int key) {
+  int lo = 0, hi = a.length - 1;
+  while (lo <= hi) {
+    int mid = lo + (hi - lo) / 2;
+    if (a[mid] == key) return mid;
+    if (a[mid] < key) lo = mid + 1;
+    else hi = mid - 1;
+  }
+  return -1;
+}
+~~~`],
+['dsa',/dijkstra|shortest path/,"Dijkstra's algorithm",`Dijkstra's algorithm finds the shortest path from one source to every other node in a weighted graph. It repeatedly picks the unvisited node with the smallest known distance (using a min-heap) and relaxes its edges. It runs in O((V + E) log V) and fails with negative edge weights, where Bellman-Ford is used instead.`],
+['dsa',/\bgraphs?\b|\bbfs\b|\bdfs\b|breadth|depth.first/,'Graphs, BFS and DFS',`A graph is a set of vertices joined by edges, stored as an adjacency list (good for sparse graphs) or an adjacency matrix. BFS explores level by level using a queue and finds shortest paths in unweighted graphs. DFS goes as deep as possible first using a stack or recursion. Both run in O(V + E).`],
+['dsa',/\bheaps?\b|priority queue/,'Heaps',`A heap is a complete binary tree where every parent is smaller (min-heap) or larger (max-heap) than its children, so the root is the minimum or maximum. Insert and remove-root are O(log n) and peek is O(1). Heaps power priority queues, heap sort and Dijkstra's algorithm.`],
+['dsa',/\bstacks?\b|\bqueues?\b|\blifo\b|\bfifo\b/,'Stacks and queues',`A stack is last-in, first-out (LIFO): push and pop at one end. It is used for undo, function calls and bracket matching. A queue is first-in, first-out (FIFO): enqueue at the back and dequeue at the front. It is used for scheduling and BFS. Both give O(1) insert and remove.`],
+['dsa',/linked list/,'Linked lists',`A linked list is a chain of nodes, each holding data and a reference to the next node. Insert or delete at the head is O(1), but searching is O(n) because you walk node by node. Types: singly, doubly (previous and next) and circular.
+~~~
+class Node {
+  int data;
+  Node next;
+  Node(int d) { data = d; }
+}
+~~~`],
+['dsa',/\bbst\b|binary tree|\btrees?\b|traversal|inorder|preorder|postorder/,'Trees and BST',`A tree is a hierarchy of nodes with one root. A binary search tree (BST) keeps smaller values on the left and larger on the right, so search, insert and delete average O(log n) but degrade to O(n) if the tree becomes a chain. Traversals: inorder (left, root, right) gives sorted order in a BST, preorder visits the root first, postorder visits it last, and level order uses a queue.`],
+['dsa',/dynamic programming|\bdp\b|memoi[sz]ation|fibonacci/,'Dynamic programming',`Dynamic programming breaks a problem into overlapping subproblems and stores each answer so it is computed once. Use memoization (recursion plus a cache) or tabulation (a bottom-up table). Fibonacci drops from O(2^n) to O(n).
+~~~
+int fib(int n) {
+  int[] f = new int[n + 2];
+  f[0] = 0; f[1] = 1;
+  for (int i = 2; i <= n; i++) f[i] = f[i - 1] + f[i - 2];
+  return f[n];
+}
+~~~`],
+['dsa',/greedy/,'Greedy algorithms',`A greedy algorithm makes the best local choice at each step, hoping to reach the global optimum. It works for activity selection, Huffman coding and Kruskal's or Prim's minimum spanning tree. It fails for problems like 0/1 knapsack, which need dynamic programming.`],
+['dsa',/recurs|factorial/,'Recursion',`Recursion is a function calling itself on a smaller version of the problem. It needs a base case to stop and a recursive case that moves toward it.
+~~~
+int factorial(int n) {
+  if (n <= 1) return 1;       // base case
+  return n * factorial(n - 1); // recursive case
+}
+~~~`],
+['dsa',/big.?o|complexity/,'Big-O',`Big-O describes how running time grows with input size n. O(1) is constant, O(log n) grows slowly (binary search), O(n) is linear, O(n log n) is efficient sorting and O(n²) comes from nested loops. Space complexity measures extra memory in the same way.`],
+['java',/jdbc/,'JDBC',`JDBC connects Java to a database. Steps: open a Connection, create a PreparedStatement, run it, read the ResultSet, then close everything.
+~~~
+Connection con = DriverManager.getConnection(url, user, pass);
+PreparedStatement ps = con.prepareStatement("SELECT * FROM users WHERE id = ?");
+ps.setInt(1, 5);
+ResultSet rs = ps.executeQuery();
+while (rs.next()) System.out.println(rs.getString("name"));
+con.close();
+~~~
+Use PreparedStatement instead of joining strings, which prevents SQL injection.`],
+['java',/hello world|main method|public static void main/,'Hello World and main',`Every Java program starts at the main method.
+~~~
+public class Main {
+  public static void main(String[] args) {
+    System.out.println("Hello, World!");
+  }
+}
+~~~`],
+['java',/polymorphism|overload|overrid/,'Polymorphism',`Polymorphism means one interface, many behaviours. Compile-time polymorphism is method overloading (same name, different parameters). Run-time polymorphism is method overriding: a subclass redefines a parent method and the JVM picks the version from the actual object.
+~~~
+class Animal { void sound() { System.out.println("..."); } }
+class Dog extends Animal { void sound() { System.out.println("Woof"); } }
+Animal a = new Dog();
+a.sound(); // prints Woof
+~~~`],
+['java',/inherit|extends|\bsuper\b/,'Inheritance',`Inheritance lets a child class reuse and extend a parent class with the extends keyword. Java allows single inheritance for classes, and a class can implement many interfaces. super refers to the parent: super() calls its constructor and super.method() calls its method.`],
+['java',/abstract class|abstract method|interface/,'Abstract class vs interface',`An abstract class can have abstract methods (no body) and normal methods, plus fields and constructors, but it cannot be instantiated. An interface declares what a class must do, and a class can implement many interfaces. Use an abstract class for shared state and code, and an interface for a capability contract.`],
+['java',/\boop\b|object.oriented|encapsulation|abstraction/,'OOP',`OOP organises code around objects. Four pillars: encapsulation (private fields with public getters and setters), abstraction (expose only what is needed), inheritance (reuse a parent class) and polymorphism (one interface, many behaviours).`],
+['py',/python class|__init__|\bself\b/,'Python classes',`A Python class uses __init__ as its constructor and self for the current object.
+~~~
+class Student:
+    def __init__(self, name):
+        self.name = name
+
+    def greet(self):
+        return "Hi, " + self.name
+
+s = Student("Asha")
+print(s.greet())
+~~~`],
+['java',/\bclass(es)?\b|\bobjects?\b|constructor/,'Classes and objects',`A class is a blueprint and an object is an instance of it created with new. A constructor has the class name, no return type, and runs when the object is created.
+~~~
+class Student {
+  String name;
+  Student(String name) { this.name = name; }
+}
+Student s = new Student("Asha");
+~~~`],
+['java',/exception|try.?catch|\bfinally\b|\bthrows?\b/,'Exception handling',`Exceptions are runtime problems handled with try, catch and finally. Checked exceptions (like IOException) must be caught or declared with throws. Unchecked ones (like NullPointerException) extend RuntimeException. finally always runs, so use it to close resources.
+~~~
+try {
+  int x = 10 / 0;
+} catch (ArithmeticException e) {
+  System.out.println("Cannot divide by zero");
+} finally {
+  System.out.println("Done");
+}
+~~~`],
+['java',/collections?\b|arraylist|hashmap|hashset|treemap|\bmap\b/,'Java collections',`The Java Collections Framework gives ready-made data structures. ArrayList is a resizable array with fast index access. LinkedList is fast at inserting and removing at the ends. HashSet stores unique values with average O(1) lookup. HashMap stores key-value pairs with average O(1) get and put. TreeMap keeps its keys sorted.`],
+['dsa',/hash/,'Hashing',`A hash table maps keys to array slots using a hash function, giving average O(1) lookup. When two keys land in the same slot (a collision), it resolves it with chaining (a list per slot) or open addressing (probe for the next free slot).`],
+['dsa',/\barrays?\b/,'Arrays',`An array stores elements in one block of memory, so reading by index is O(1). Inserting or deleting in the middle is O(n) because items shift. Most languages fix the size when the array is created.`],
+['java',/\bstrings?\b|stringbuilder|immutable/,'Strings',`Strings in Java are immutable: every change creates a new object. Use StringBuilder when you modify text in a loop. Compare content with equals(), not ==, which compares references.`],
+['java',/\bstatic\b|\bfinal\b/,'static and final',`static means the member belongs to the class, not to any object, so all objects share it. final means it cannot change: a final variable is a constant, a final method cannot be overridden and a final class cannot be extended.`],
+['java',/multithread|runnable|synchroni[sz]ed|java thread/,'Multithreading in Java',`Multithreading runs tasks at the same time. Create a thread by implementing Runnable (preferred) or extending Thread, then call start(). Use synchronized to stop two threads changing shared data at once.
+~~~
+Thread t = new Thread(() -> System.out.println("Running"));
+t.start();
+~~~`],
+['java',/\bjvm\b|\bjdk\b|\bjre\b|what is java|bytecode|platform independent/,'JVM, JDK and JRE',`javac compiles Java source into bytecode, which the JVM runs on any operating system, so Java is platform independent. The JDK is the full development kit (compiler plus tools), the JRE is what you need to run programs, and the JVM is the engine inside the JRE.`],
+['java',/access modifier|\bpublic\b|\bprivate\b|\bprotected\b/,'Access modifiers',`Java has four access levels: public (visible everywhere), protected (same package and subclasses), default with no keyword (same package) and private (same class only).`],
+['math',/derivativ|differentiat|d\/dx/,'Derivatives',`The derivative measures the rate of change of a function. Power rule: d/dx of xⁿ is n·xⁿ⁻¹. Product rule: (uv)' = u'v + uv'. Quotient rule: (u/v)' = (u'v − uv') / v². Chain rule: d/dx f(g(x)) = f'(g(x))·g'(x). Example: the derivative of 3x² + 5x is 6x + 5.`],
+['math',/integra|antiderivative/,'Integration',`Integration reverses differentiation. ∫ xⁿ dx = xⁿ⁺¹/(n + 1) + C for n ≠ −1, ∫ 1/x dx = ln|x| + C, ∫ eˣ dx = eˣ + C and ∫ sin x dx = −cos x + C. A definite integral from a to b equals F(b) − F(a) and gives the area under the curve.`],
+['math',/\blimits?\b/,'Limits',`A limit is the value a function approaches as x approaches a point. If direct substitution gives 0/0, factorise, rationalise or use L'Hôpital's rule (differentiate top and bottom). A useful result: the limit of sin x / x as x → 0 is 1.`],
+['math',/quadratic|roots of|discriminant/,'Quadratic equations',`For ax² + bx + c = 0, x = (−b ± √(b² − 4ac)) / 2a. The discriminant b² − 4ac decides the roots: positive means two real roots, zero means one repeated root and negative means no real roots. Example: x² − 5x + 6 = 0 gives x = 2 or x = 3.`],
+['math',/matri(x|ces)|determinant/,'Matrices',`A matrix is a grid of numbers. Add matrices of the same size element by element. To multiply A (m×n) by B (n×p), take rows times columns to get an m×p matrix; the order matters. For [[a, b], [c, d]] the determinant is ad − bc, and the inverse exists only when it is not zero.`],
+['math',/permutation|combination|\bncr\b|\bnpr\b/,'Permutations and combinations',`Permutations count ordered arrangements: nPr = n! / (n − r)!. Combinations count unordered selections: nCr = n! / (r! (n − r)!). Choosing 2 people from 5 gives 5C2 = 10 ways, while arranging 2 of 5 in order gives 5P2 = 20.`],
+['math',/probab/,'Probability',`Probability = favourable outcomes / total outcomes, always between 0 and 1. For A or B: P(A ∪ B) = P(A) + P(B) − P(A ∩ B). For independent events, P(A and B) = P(A) × P(B). Conditional probability: P(A|B) = P(A ∩ B) / P(B). A fair die shows 4 with probability 1/6.`],
+['math',/trigonometr|\bsin\b|\bcos\b|\btan\b|pythagoras|pythagorean/,'Trigonometry',`Key identities: sin²θ + cos²θ = 1 and tan θ = sin θ / cos θ. Pythagoras: in a right triangle a² + b² = c². Useful values: sin 30° = 1/2, cos 60° = 1/2, sin 45° = cos 45° = √2/2 and sin 90° = 1.`],
+['math',/\blog(arithm)?s?\b/,'Logarithms',`log_b(x) is the power you raise b to in order to get x. Rules: log(ab) = log a + log b, log(a/b) = log a − log b, log(aⁿ) = n·log a. Change of base: log_b x = ln x / ln b. Example: log₁₀(1000) = 3.`],
+['math',/statistic|\bmean\b|median|\bmode\b|standard deviation|variance|average/,'Statistics',`The mean is the sum divided by the count, the median is the middle value when sorted and the mode is the most frequent value. Variance is the average squared distance from the mean, and standard deviation is its square root. Example: 2, 4, 6, 8 has mean 5 and median 5.`],
+['math',/progressions?|\bap\b|\bgp\b|series/,'Progressions',`Arithmetic progression (AP): terms differ by a constant d, the nth term is a + (n − 1)d and the sum is n/2 · (2a + (n − 1)d). Geometric progression (GP): terms multiply by a ratio r, the nth term is a·rⁿ⁻¹ and the sum is a(rⁿ − 1)/(r − 1) for r ≠ 1.`],
+['math',/simultaneous|linear equation|solve for/,'Linear equations',`To solve two equations in two unknowns, use substitution (solve one for a variable and plug it in) or elimination (add or subtract the equations to cancel a variable). Example: x + y = 5 and x − y = 1 add to 2x = 6, so x = 3 and y = 2.`],
+['math',/binary number|number system|hexadecimal|binary to decimal|decimal to binary/,'Number systems',`Binary uses base 2 (digits 0 and 1), octal uses base 8 and hexadecimal uses base 16. To convert decimal to binary, divide by 2 repeatedly and read the remainders from bottom to top: 13 becomes 1101. To go back, add powers of 2: 1101 = 8 + 4 + 1 = 13.`],
+['py',/comprehension/,'List comprehensions',`A list comprehension builds a list in one line: [expression for item in iterable if condition].
+~~~
+squares = [x * x for x in range(1, 6)]   # [1, 4, 9, 16, 25]
+evens = [x for x in range(10) if x % 2 == 0]
+~~~`],
+['py',/\blists?\b|tuple|dictionar|\bdict\b|\bsets?\b|data types?/,'Python data types',`List: ordered and changeable, [1, 2, 3]. Tuple: ordered and immutable, (1, 2, 3). Set: unordered with unique items, {1, 2, 3}. Dictionary: key-value pairs, {"name": "Asha"}. Use a dict to look up by key and a set to remove duplicates.`],
+['py',/lambda|\bdef\b|python function|decorator/,'Python functions',`Functions use def, and lambda makes a small one-line function.
+~~~
+def add(a, b=0):
+    return a + b
+
+square = lambda x: x * x
+print(add(2, 3), square(4))
+~~~`],
+['py',/\bloops?\b|\belif\b|if.?else|conditional/,'Loops and conditions',`Python repeats work with for and while loops and branches with if, elif and else. Indentation marks the block.
+~~~
+for i in range(1, 4):
+    print(i)
+
+n = 5
+while n > 0:
+    n -= 2
+
+if n < 0:
+    print("negative")
+elif n == 0:
+    print("zero")
+else:
+    print("positive")
+~~~`],
+['py',/\bstrings?\b|f.?string|slicing/,'Python strings',`Python strings are immutable text. Slice with s[start:end], split and join with .split() and .join(), and build text with f-strings.
+~~~
+s = "EduBridge"
+print(s[0:3])      # Edu
+print(s.upper())   # EDUBRIDGE
+name = "Asha"
+print(f"Hello, {name}!")
+print(",".join(["a", "b"]))   # a,b
+~~~`],
+['py',/exception|\bexcept\b|\braise\b/,'Exceptions in Python',`Python handles errors with try, except, else and finally. Catch specific exceptions, and use raise to signal your own.
+~~~
+try:
+    n = int(input("Number: "))
+    print(10 / n)
+except ValueError:
+    print("Not a number")
+except ZeroDivisionError:
+    print("Cannot divide by zero")
+finally:
+    print("Done")
+~~~`],
+['py',/file handling|open\(|\bfiles\b|read a file|write a file/,'File handling',`Use open() inside a with block, which closes the file for you. Modes: "r" reads, "w" writes (and overwrites) and "a" appends.
+~~~
+with open("notes.txt", "w") as f:
+    f.write("Hello")
+
+with open("notes.txt") as f:
+    for line in f:
+        print(line.strip())
+~~~`],
+['py',/module|\bimport\b|\bpip\b|librar|package/,'Modules and libraries',`A module is a Python file you can import, and a package is a folder of modules. The standard library has many (math, random, datetime, os). Install third-party libraries with pip.
+~~~
+import math
+from random import randint
+
+print(math.sqrt(16), randint(1, 6))
+# pip install requests
+~~~`],
+['py',/python|variables?/,'Python basics',`Python is an interpreted, dynamically typed language. You do not declare variable types, and indentation defines blocks.
+~~~
+name = "Asha"
+for i in range(3):
+    print(name, i)
+~~~`],
+['db',/nosql|mongodb|sql vs|relational vs/,'SQL vs NoSQL',`SQL (relational) databases such as MySQL and PostgreSQL store data in tables with a fixed schema and support joins and ACID transactions. NoSQL databases such as MongoDB (documents), Redis (key-value) and Cassandra (wide-column) use flexible schemas and scale out easily. Choose SQL for structured, related data and strict consistency, and NoSQL for large, changing or loosely structured data.`],
+['db',/\ber\b|er model|er diagram|entity|relationship/,'ER model',`An ER (entity-relationship) model plans a database before you build it. Entities are things such as Student or Course that become tables, attributes are their properties that become columns, and relationships link entities. Cardinality describes the link: one-to-one, one-to-many (one teacher, many classes) or many-to-many (students and courses, which needs a junction table).`],
+['db',/constraint|not null|unique key|check constraint/,'Constraints',`Constraints keep data valid. NOT NULL forbids empty values, UNIQUE forbids duplicates, PRIMARY KEY is NOT NULL plus UNIQUE, FOREIGN KEY links to another table, CHECK limits values and DEFAULT supplies a value when none is given.
+~~~
+CREATE TABLE students (
+  id INT PRIMARY KEY,
+  email VARCHAR(80) UNIQUE NOT NULL,
+  age INT CHECK (age >= 16),
+  course_id INT,
+  FOREIGN KEY (course_id) REFERENCES courses(id)
+);
+~~~`],
+['db',/subquer|nested quer|\bviews?\b|\bcte\b/,'Subqueries and views',`A subquery is a query inside another query, for example to compare with an average. A view is a saved query that behaves like a virtual table, useful for simplifying joins and limiting what users can see.
+~~~
+SELECT name FROM students
+WHERE marks > (SELECT AVG(marks) FROM students);
+
+CREATE VIEW top_students AS
+SELECT name, marks FROM students WHERE marks > 80;
+~~~`],
+['db',/normali[sz]ation|\b[123]nf\b|bcnf/,'Normalization',`Normalization organises tables to reduce duplicate data. 1NF: every cell holds a single value. 2NF: 1NF plus no partial dependency on part of a composite key. 3NF: 2NF plus no transitive dependency, so non-key columns depend only on the key. BCNF is a stricter 3NF where every determinant is a candidate key.`],
+['db',/\bjoins?\b/,'SQL joins',`A join combines rows from two tables using a related column. INNER JOIN returns only matching rows. LEFT JOIN returns every row from the left table plus matches. RIGHT JOIN is the reverse. FULL JOIN returns every row from both.
+~~~
+SELECT s.name, c.title
+FROM students s
+INNER JOIN courses c ON s.course_id = c.id;
+~~~`],
+['db',/primary key|foreign key|candidate key|\bkeys?\b/,'Keys',`A primary key uniquely identifies each row and cannot be NULL. A foreign key is a column that references another table's primary key to link the tables. A candidate key is any column set that could serve as the primary key.`],
+['db',/\bacid\b|transaction|commit|rollback/,'ACID and transactions',`ACID keeps transactions reliable. Atomicity: all steps happen or none do. Consistency: the database moves from one valid state to another. Isolation: concurrent transactions do not interfere. Durability: committed data survives a crash. COMMIT saves a transaction and ROLLBACK undoes it.`],
+['db',/\bindex(es)?\b|indexing/,'Indexes',`An index is a separate structure (usually a B-tree) that lets the database find rows without scanning the whole table, like a book index. It speeds up SELECT with WHERE and JOIN but slows INSERT, UPDATE and DELETE and uses extra space.
+~~~
+CREATE INDEX idx_email ON users(email);
+~~~`],
+['db',/\bsql\b|\bselect\b|group by|\bdbms\b|database|\bquery\b|queries/,'SQL basics',`SQL is the language for relational databases. SELECT reads, INSERT adds, UPDATE changes, DELETE removes, and CREATE and ALTER define tables.
+~~~
+SELECT dept, COUNT(*) AS total
+FROM employees
+WHERE salary > 30000
+GROUP BY dept
+HAVING COUNT(*) > 2
+ORDER BY total DESC;
+~~~`],
+['os',/\bipc\b|inter.?process|\bpipes?\b|message passing|shared memory/,'Inter-process communication',`Inter-process communication (IPC) lets separate processes exchange data. Shared memory is the fastest: processes read and write the same region, but they need synchronisation. Message passing sends data through the OS using pipes, message queues or sockets, which is safer but slower.`],
+['os',/page replacement|\blru\b|belady|optimal page/,'Page replacement',`When memory is full and a page fault occurs, the OS must pick a page to replace. FIFO removes the oldest page and can suffer Belady's anomaly (more frames, more faults). LRU removes the least recently used page and performs well. Optimal removes the page not needed for the longest time; it is the best possible but cannot be implemented in practice, so it is used as a benchmark.`],
+['os',/file system|filesystem|inode|\bntfs\b|\bfat32\b|directory structure/,'File systems',`A file system organises how files are stored on disk. Files have attributes (name, size, permissions) and live in a directory tree. Allocation methods: contiguous (fast but fragments), linked (no fragmentation but slow random access) and indexed (an index block lists every block of the file). Common systems are FAT32, NTFS, ext4 and APFS.`],
+['os',/disk scheduling|\bscan\b|c-scan|seek time|\bsstf\b/,'Disk scheduling',`Disk scheduling orders read and write requests to cut seek time (head movement). FCFS serves requests in arrival order. SSTF serves the nearest request first but can starve far ones. SCAN (the elevator) sweeps the head in one direction serving requests, then reverses. C-SCAN sweeps one way only and jumps back, giving more uniform waiting.`],
+['os',/deadlock/,'Deadlock',`A deadlock happens when processes each hold a resource and wait for one held by another, so none can continue. It needs four conditions together: mutual exclusion, hold and wait, no preemption and circular wait. Break any one to prevent it. The banker's algorithm avoids deadlock by only granting safe requests.`],
+['os',/schedul|round robin|\bfcfs\b|\bsjf\b/,'CPU scheduling',`CPU scheduling decides which process runs next. FCFS runs in arrival order (simple, but long jobs delay short ones). SJF runs the shortest job first and gives the lowest average waiting time. Round Robin gives each process a fixed time quantum in turn, which suits time-sharing. Priority scheduling runs the highest priority first and can starve low-priority processes.`],
+['os',/paging|virtual memory|segmentation|memory management|page fault|thrashing/,'Memory management',`Paging splits memory into fixed-size pages and frames, which removes external fragmentation. Virtual memory lets programs use more memory than the RAM available by keeping unused pages on disk. A page fault happens when a needed page is not in RAM and the OS loads it. Thrashing is when the system spends more time swapping pages than running.`],
+['os',/semaphore|mutex|critical section|race condition|synchroni[sz]ation/,'Synchronisation',`A race condition happens when threads change shared data at the same time. The critical section is the code that touches shared data, and only one process should be inside it at once. A mutex is a lock owned by one thread. A semaphore is a counter that controls access: wait() decrements it and signal() increments it.`],
+['os',/process|thread/,'Processes and threads',`A process is a running program with its own memory. A thread is a lighter unit inside a process: threads share the code, data and heap, but each has its own stack and registers. Process states are new, ready, running, waiting and terminated. The kernel manages processes, memory, files and devices.`],
+['os',/operating system|\bos\b|kernel|system call/,'Operating system basics',`An operating system manages the hardware and gives programs a safe way to use it. Its jobs: process management, memory management, file systems, device management and security. The kernel is the core that runs in privileged mode, and programs ask it for services through system calls such as open, read and fork. Types: batch, time-sharing, real-time and distributed.`],
+['net',/router|switch|\bhub\b|modem|gateway|network device/,'Network devices',`A hub repeats data to every port. A switch learns MAC addresses and sends data only to the right port, so it is faster and more private. A router connects different networks and forwards packets using IP addresses. A modem converts signals between your network and the internet provider, and a gateway connects networks that use different protocols.`],
+['net',/subnet|cidr/,'Subnetting',`Subnetting splits one IP network into smaller ones. The subnet mask shows which bits are the network part: 255.255.255.0 is the same as /24, which gives 256 addresses, of which 254 are usable hosts (the first is the network address and the last is the broadcast address). Each extra bit given to the network halves the hosts. Example: /26 gives 64 addresses per subnet.`],
+['net',/routing|\brip\b|\bospf\b|\bbgp\b|static route/,'Routing',`Routing decides the path packets take between networks. A router keeps a routing table of destinations and next hops. Static routes are set by hand. Dynamic routing protocols learn routes automatically: RIP uses hop count, OSPF uses link costs inside one organisation and BGP exchanges routes between organisations on the internet.`],
+['net',/\bemail\b|\bsmtp\b|\bpop3?\b|\bimap\b|\bftp\b|\bssh\b|telnet/,'Email and FTP',`SMTP sends email between servers (port 25 or 587), while POP3 and IMAP let you read it: POP3 downloads messages, and IMAP keeps them on the server and syncs your devices. FTP transfers files (port 21) but sends data unencrypted. SFTP and SSH (port 22) do the job securely.`],
+['net',/firewall|\bvpn\b|encrypt|cryptograph|network security|phishing|\bddos\b/,'Network security',`A firewall filters traffic using rules. A VPN creates an encrypted tunnel over the internet. Encryption turns data into unreadable ciphertext: symmetric uses one shared key (AES) and asymmetric uses a public and private key pair (RSA). Common attacks: phishing (fake messages that steal data), DDoS (flooding a server with traffic) and man-in-the-middle (secretly reading traffic).`],
+['net',/\bosi\b|layers?\b/,'OSI model',`The OSI model has 7 layers: Physical, Data Link, Network, Transport, Session, Presentation and Application. Examples: Ethernet and MAC addresses at Data Link, IP at Network, TCP and UDP at Transport, HTTP at Application. The practical TCP/IP model groups these into 4 layers.`],
+['net',/\btcp\b|\budp\b/,'TCP vs UDP',`TCP is connection-oriented: it sets up a connection, delivers data in order and retransmits lost data, so it suits web pages, email and file transfer. UDP is connectionless with no handshake or guarantees, but it is faster, so it suits video calls, games and DNS lookups.`],
+['net',/https?|\bssl\b|\btls\b/,'HTTP and HTTPS',`HTTP is how browsers request web pages: the client sends a request (GET, POST, PUT or DELETE) and the server replies with a status code such as 200 OK, 404 Not Found or 500 Server Error. HTTPS is HTTP encrypted with TLS so data cannot be read or changed in transit. Default ports are 80 for HTTP and 443 for HTTPS.`],
+['net',/\bdns\b|ip address|\bipv[46]\b/,'IP and DNS',`An IPv4 address is 32 bits (like 192.168.1.10) and an IPv6 address is 128 bits. DNS translates domain names such as example.com into IP addresses. A router forwards packets between networks, and a subnet mask splits an address into its network and host parts.`],
+['net',/\blan\b|\bwan\b|topolog|computer network|networking|network basics|what is a network/,'Network basics',`A computer network connects devices to share data and resources. By size: LAN (a room or building), MAN (a city) and WAN (countries, like the internet). Topologies describe the layout: bus (one shared cable), star (every device connects to a central switch, the most common), ring and mesh (every device links to several others, very reliable but costly).`]
+];
+const EX={
+ all:['Explain binary search with code','What is polymorphism?','How do I find a derivative?','What is a deadlock?'],
+ dsa:['Explain AVL trees','Binary search with code','BFS vs DFS','What is dynamic programming?'],
+ java:['What is polymorphism?','Abstract class vs interface','How does exception handling work?','Explain HashMap'],
+ math:['Derivative rules','Solve a quadratic equation','Permutations vs combinations','What is probability?'],
+ py:['List vs tuple vs dictionary','What is a list comprehension?','Python class example','Python function and lambda'],
+ db:['Explain normalization','Types of SQL joins','What is ACID?','Primary key vs foreign key'],
+ os:['What is a deadlock?','CPU scheduling algorithms','Explain paging','Process vs thread'],
+ net:['OSI model layers','TCP vs UDP','What is DNS?','How does HTTPS work?']
+};
+const CUR={
+ dsa:['Big-O','Arrays','Linked lists','Stacks and queues','Recursion','Hashing','Sorting','Merge sort and quick sort','Binary search','Trees and BST','AVL trees','Heaps','Graphs, BFS and DFS',"Dijkstra's algorithm",'Dynamic programming'],
+ java:['JVM, JDK and JRE','Hello World and main','Classes and objects','Access modifiers','static and final','Strings','Inheritance','Polymorphism','Abstract class vs interface','OOP','Exception handling','Java collections','Multithreading in Java','JDBC'],
+ math:['Linear equations','Quadratic equations','Logarithms','Progressions','Number systems','Trigonometry','Limits','Derivatives','Integration','Matrices','Permutations and combinations','Probability','Statistics'],
+ py:['Python basics','Loops and conditions','Python data types','Python strings','Python functions','List comprehensions','Python classes','Exceptions in Python','File handling','Modules and libraries'],
+ db:['SQL basics','Keys','Constraints','ER model','SQL joins','Subqueries and views','Normalization','Indexes','ACID and transactions','SQL vs NoSQL'],
+ os:['Operating system basics','Processes and threads','CPU scheduling','Synchronisation','Deadlock','Memory management','Page replacement','File systems','Disk scheduling','Inter-process communication'],
+ net:['Network basics','Network devices','OSI model','TCP vs UDP','IP and DNS','Subnetting','Routing','HTTP and HTTPS','Email and FTP','Network security']
+};
+const GREET="Hi! I'm your AI Teacher. Pick a subject above or just ask me anything about DSA, Java, Maths, Python, DBMS, Operating Systems or Networks. I can include code examples.";
+function answer(q,sub){
+  const t=q.toLowerCase().trim();
+  if(/^(hi|hello|hey|hii|good (morning|afternoon|evening))\b/.test(t))return 'Hello! What would you like to learn today?';
+  if(/^(thanks|thank you|thx)\b/.test(t))return 'You are welcome! Ask me anything else, or take a quiz to test yourself.';
+  const ex=t.replace(/^(what is|what's|calculate|compute|solve|find)\s+/,'').replace(/[?=\s]+$/,'');
+  if(/^[\d\s+\-*/().%^]+$/.test(ex)&&/\d/.test(ex)&&/[+\-*/%^]/.test(ex)){
+    try{const v=Function('"use strict";return ('+ex.replace(/\^/g,'**')+')')();if(Number.isFinite(v))return ex+' = '+parseFloat(v.toPrecision(12))}catch(e){}
+  }
+  const sq=t.match(/(?:square root|sqrt)(?: of)?\s*(\d+(?:\.\d+)?)/);
+  if(sq)return 'The square root of '+sq[1]+' is '+parseFloat(Math.sqrt(+sq[1]).toPrecision(12))+'.';
+  if(sub==='all'){if(/\bpython\b/.test(t))sub='py';else if(/\bjava\b/.test(t))sub='java'}
+  const pool=KB.filter(e=>sub==='all'||e[0]===sub);
+  let hit=pool.find(e=>e[1].test(t)),note='';
+  if(!hit&&sub!=='all'){hit=KB.find(e=>e[1].test(t));if(hit)note='That is a '+sname(hit[0])+' topic, so here is the answer:\n\n'}
+  if(hit)return note+hit[3];
+  return sub==='all'
+    ?'I do not have a ready answer for that yet. Pick a subject above, or ask about topics like AVL trees, polymorphism, derivatives, SQL joins or deadlocks.'
+    :'I do not have a ready answer for that yet in '+sname(sub)+'. Try asking about: '+pool.slice(0,8).map(e=>e[2]).join(', ')+'.';
+}
+async function reply(q){
+  if(AI_URL){try{const r=await fetch(AI_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,subject:S.tsub})});const d=await r.json();if(d.answer)return d.answer}catch(e){}}
+  return answer(q,S.tsub);
+}
+const fmtMsg=t=>t.split('~~~').map((p,i)=>i%2?`<pre class="code">${esc(p.trim())}</pre>`:(p.trim()?`<span>${esc(p.trim())}</span>`:'')).join('');
+
+/* ---------- helpers ---------- */
+const me=()=>S.prev?S.demo:DB.users[S.user];
+const pub=()=>DB.quizzes.filter(q=>q.published);
+const best=(u,id)=>Math.max(0,...u.results.filter(r=>r.qid===id).map(r=>Math.round(r.score/r.total*100)));
+const sprog=(u,sid)=>{const qs=pub().filter(q=>q.subject===sid);return qs.length?Math.round(qs.reduce((a,q)=>a+best(u,q.id),0)/qs.length):0};
+const overall=u=>Math.round(SUBJ.reduce((a,s)=>a+sprog(u,s[0]),0)/SUBJ.length);
+const avgScore=u=>u.results.length?Math.round(u.results.reduce((a,r)=>a+r.score/r.total*100,0)/u.results.length):0;
+const fToday=u=>Math.floor(u.sessions.filter(s=>new Date(s.ts).toDateString()===new Date().toDateString()).reduce((a,s)=>a+s.done,0)/60);
+const locked=()=>{const u=S.role==='student'?me():null;return !!(u&&u.fa)};
+const touch=u=>{u.last=Date.now();save()};
+const fmt=t=>String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+const dkey=(sid,n)=>sid+':'+n;
+const isDone=(u,k)=>(u.done||[]).includes(k);
+const dcount=(u,sid)=>CUR[sid].filter(n=>isDone(u,dkey(sid,n))).length;
+const tps=sid=>CUR[sid].map(n=>KB.find(e=>e[0]===sid&&e[2]===n));
+const bar2=p=>`<div class="bar"><i style="width:${p}%"></i></div>`;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),1800)}
+function fail(m){const e=$('.err');if(e)e.textContent=m}
+
+const LOGO='<svg viewBox="0 0 32 32" fill="none"><path d="M3 24V12a13 13 0 0 1 26 0v12" stroke="#ffb627" stroke-width="3" stroke-linecap="round"/><path d="M3 24h26M11 24v-8M16 24v-11M21 24v-8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg>';
+const gauge=p=>`<svg viewBox="0 0 200 110" class="gauge" role="img" aria-label="Overall progress ${p}%"><path d="M20 100A80 80 0 0 1 180 100" fill="none" stroke="#dfe5f1" stroke-width="16" stroke-linecap="round"/><path d="M20 100A80 80 0 0 1 180 100" fill="none" stroke="#2b4eff" stroke-width="16" stroke-linecap="round" stroke-dasharray="${(2.513*p).toFixed(1)} 251.3"/><text x="100" y="92" text-anchor="middle" class="gnum">${p}%</text></svg>`;
+const ring=(p,l,c)=>`<div class="ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="#dfe5f1" stroke-width="9"/><circle cx="40" cy="40" r="34" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${(2.136*p).toFixed(1)} 213.6" transform="rotate(-90 40 40)"/><text x="40" y="45" text-anchor="middle">${p}%</text></svg>${l}</div>`;
+const bar=p=>`<div class="bar ${p<60?'low':''}"><i style="width:${p}%"></i></div>`;
+const subBars=u=>SUBJ.map(s=>{const p=sprog(u,s[0]);return `<div style="margin-bottom:12px"><div class="row between"><b>${esc(s[1])}</b><span class="mut sm">${p}%</span></div>${bar(p)}</div>`}).join('');
+
+/* ---------- sign up / sign in ---------- */
+const RULES=[['At least 8 characters',p=>p.length>=8],['An uppercase letter',p=>/[A-Z]/.test(p)],['A lowercase letter',p=>/[a-z]/.test(p)],['A number',p=>/\d/.test(p)],['A special character such as @ # $ !',p=>/[^A-Za-z0-9\s]/.test(p)]];
+const rules=p=>RULES.map(([t,f])=>`<li class="${f(p)?'ok':''}">${f(p)?'✓':'○'} ${t}</li>`).join('');
+const strong=p=>RULES.every(([,f])=>f(p))&&!/\s/.test(p);
+function auth(){
+  const m=S.auth,ad=m==='admin';
+  const logo=`<div class="brand" style="color:var(--ink);font-size:1.5rem">${LOGO.replace('#fff','#14213d')} EduBridge</div>`;
+  const body=m==='signup'
+  ?`<h2 style="font-size:1.25rem;margin:18px 0 4px">Create your account</h2>
+  <p class="mut sm" style="margin-bottom:14px">Sign up once. Then sign in with your own username and password.</p>
+  <label>Full name<input id="sn" autocomplete="name" maxlength="40"></label>
+  <label>Username<input id="su" autocomplete="username" maxlength="20" placeholder="Letters, numbers, underscore"></label>
+  <label>Password<input id="sp" type="password" autocomplete="new-password"></label>
+  <ul class="rules" id="rules">${rules('')}</ul>
+  <label>Confirm password<input id="sc" type="password" autocomplete="new-password"></label>
+  <p class="hint" style="margin:0 0 10px">Your quiz scores, focus time and AI Teacher questions are shared with your admin.</p>
+  <p class="err">${esc(S.err)}</p>
+  <button class="btn" style="width:100%" data-act="signup">Create account</button>
+  <p class="hint">Already have an account? <button class="link" data-act="auth" data-m="signin">Sign in</button></p>`
+  :`<h2 style="font-size:1.25rem;margin:18px 0 4px">${ad?'Admin sign in':'Sign in'}</h2>
+  <p class="mut sm" style="margin-bottom:14px">${ad?'Only the admin can sign in here.':'Use the username and password you created.'}</p>
+  ${S.ok?`<p class="okmsg">${esc(S.ok)}</p>`:''}
+  <label>Username<input id="u" autocomplete="username" value="${esc(S.pre)}"></label>
+  <label>Password<input id="p" type="password" autocomplete="current-password"></label>
+  <p class="err">${esc(S.err)}</p>
+  <button class="btn" style="width:100%" data-act="login">${ad?'Sign in as admin':'Sign in'}</button>
+  ${ad?`<p class="hint"><button class="link" data-act="auth" data-m="signin">Back to student sign in</button></p>`
+  :`<p class="hint">New here? <button class="link" data-act="auth" data-m="signup">Create an account</button></p><p class="hint"><button class="link" data-act="auth" data-m="admin">Admin sign in</button></p>`}`;
+  return `<div class="login"><div class="card">${logo}${body}</div></div>`;
+}
+const head=t=>`<header><div class="wrap"><div class="brand">${LOGO} ${t}</div><div class="who"><span>${esc(S.role==='admin'?'Admin':(me()||{}).name||'')}</span><button class="link" data-act="logout">Sign out</button></div></div></header>`;
+const nav=(items,cur,act)=>`<nav class="nav">${items.map(([k,l])=>`<button data-act="${act}" data-v="${k}" class="${cur===k?'on':''}">${l}</button>`).join('')}</nav>`;
+
+/* ---------- student ---------- */
+const SNAV=[['dash','Home'],['learn','Learn'],['teacher','Teacher'],['mentor','Mentor'],['focus','Focus'],['quiz','Quiz'],['prog','Progress']];
+function student(){
+  const v={dash,learn,teacher,mentor,focus:focusV,quiz,prog}[S.view]();
+  return (S.prev?`<div class="banner">Previewing the student portal. <button class="link" data-act="back">Back to admin</button></div>`:'')+(locked()?focusBar():'')+head('EduBridge')+nav(SNAV,S.view,'nav')+`<main class="wrap">${v}</main>`;
+}
+function dash(){
+  const u=me(),n=DB.notices.filter(x=>x.published);
+  return `<h2>Hi, ${esc(u.name.split(' ')[0])}</h2>
+  <div class="card hero">${gauge(overall(u))}<div><h3>Overall progress</h3><p class="mut">Across ${SUBJ.length} subjects. Finish quizzes to move it up.</p></div></div>
+  <div class="grid" style="margin-bottom:14px">
+   <button class="tile" data-act="nav" data-v="learn"><b>Learn</b><span class="mut sm">${SUBJ.length} subjects, ${Object.values(CUR).reduce((a,l)=>a+l.length,0)} topics</span></button>
+   <button class="tile" data-act="nav" data-v="teacher"><b>AI Teacher</b><span class="mut sm">Ask any subject</span></button>
+   <button class="tile" data-act="nav" data-v="mentor"><b>AI Mentor</b><span class="mut sm">Your next best step</span></button>
+   <button class="tile" data-act="nav" data-v="focus"><b>Focus Mode</b><span class="mut sm">Locked study sessions</span></button>
+   <button class="tile" data-act="nav" data-v="quiz"><b>Quiz</b><span class="mut sm">${pub().length} available</span></button>
+  </div>
+  ${n.length?`<div class="card"><h3>Notices</h3>${n.map(x=>`<div class="notice"><b>${esc(x.title)}</b><div class="sm">${esc(x.body)}</div></div>`).join('')}</div>`:''}
+  <div class="card"><h3>Subjects</h3>${subBars(u)}</div>`;
+}
+function teacher(){
+  const u=me(),sub=S.tsub,msgs=[{who:'ai',text:GREET}].concat(u.chat);
+  return `<h2>AI Teacher</h2><div class="card">
+  <div class="tabs">${[['all','All subjects']].concat(SUBJ.map(s=>[s[0],s[2]])).map(([k,l])=>`<button data-act="tsub" data-s="${k}" class="${sub===k?'on':''}">${l}</button>`).join('')}</div>
+  <div id="chat">${msgs.map(m=>`<div class="msg ${m.who}">${fmtMsg(m.text)}</div>`).join('')}${S.typing?'<div class="msg ai">Thinking…</div>':''}</div>
+  <div class="chips">${EX[sub].map(q=>`<button class="chip" data-act="ask" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>
+  <div class="row"><input id="msg" style="flex:1;margin:0" placeholder="Ask about ${sub==='all'?'any subject':esc(sname(sub))}" ${S.typing?'disabled':''}><button class="btn" data-act="send" ${S.typing?'disabled':''}>Send</button></div></div>`;
+}
+async function ask(t){
+  t=t.trim();const u=me();
+  if(!t||S.typing||!u)return;
+  u.chat.push({who:'me',text:t,sub:S.tsub,ts:Date.now()});u.asked=(u.asked||0)+1;S.typing=true;render();
+  const a=await reply(t);
+  await new Promise(r=>setTimeout(r,450));
+  u.chat.push({who:'ai',text:a,ts:Date.now()});u.chat=u.chat.slice(-60);S.typing=false;touch(u);render();
+  const m=$('#msg');if(m)m.focus();
+}
+function mentor(){
+  const u=me(),ft=fToday(u),acc=avgScore(u),foc=Math.min(100,Math.round(ft/60*100)),con=Math.min(100,u.results.length*10+u.sessions.length*10);
+  const P=SUBJ.map(s=>[s,sprog(u,s[0])]).sort((a,b)=>a[1]-b[1]),weak=P[0],top=P[P.length-1];
+  const nt=CUR[weak[0][0]].find(n=>!isDone(u,dkey(weak[0][0],n)));
+  const wq=pub().filter(q=>q.subject===weak[0][0]).sort((a,b)=>best(u,a.id)-best(u,b.id))[0];
+  return `<h2>AI Mentor</h2>
+  <div class="card"><h3>Your performance</h3><div class="rings">${ring(acc,'Quiz accuracy','#2b4eff')}${ring(foc,'Focus (60 min goal)','#12a594')}${ring(con,'Consistency','#ffb627')}</div></div>
+  <div class="card"><h3>Recommended next</h3>
+   <div class="notice"><b>${weak[1]?'Strengthen ':'Start '}${esc(weak[0][1])}</b><div class="sm">${weak[1]?`It is your lowest subject at ${weak[1]}%.`:'You have not taken a quiz here yet.'} ${wq?'A quiz is ready for it.':'No quiz is published for it yet, so start with AI Teacher.'}</div>
+   <div style="margin-top:8px">${wq?`<button class="btn sm" data-act="startq" data-id="${wq.id}">Take the quiz</button>`:`<button class="btn sm" data-act="nav" data-v="teacher">Ask AI Teacher</button>`}</div></div>
+   ${nt?`<div class="notice"><b>Learn next: ${esc(nt)}</b><div class="sm">Next topic in ${esc(weak[0][1])}.</div><div style="margin-top:8px"><button class="btn sm ghost" data-act="topen" data-s="${weak[0][0]}" data-i="${CUR[weak[0][0]].indexOf(nt)}">Open topic</button></div></div>`:''}
+   ${ft<60?`<div class="notice"><b>Do a 25-minute focus session</b><div class="sm">You have ${ft} of 60 minutes today.</div><div style="margin-top:8px"><button class="btn sm ghost" data-act="nav" data-v="focus">Open Focus Mode</button></div></div>`:''}
+   ${top[1]?`<div class="notice"><b>Keep going in ${esc(top[0][1])}</b><div class="sm">Strongest subject at ${top[1]}%.</div></div>`:''}</div>`;
+}
+
+/* ---------- focus mode (locks the screen) ---------- */
+function focusV(){
+  const u=me();
+  return `<h2>Focus Mode</h2><div class="card"><h3>Start a locked session</h3>
+  <p class="mut" style="margin-bottom:14px">A timer stays at the top of every page while you study. Nothing is locked: read lessons, ask AI Teacher or take quizzes as usual. End the session any time with the button at the top right.</p>
+  <div class="tabs">${[15,25,50].map(m=>`<button data-act="fpre" data-m="${m}" class="${S.fmin===m?'on':''}">${m} min</button>`).join('')}</div>
+  <button class="btn" data-act="fstart">Start focus session</button>
+  <p class="mut sm" style="margin-top:14px">Focused today: ${fToday(u)} min</p></div>
+  <div class="card"><h3>Recent sessions</h3>${u.sessions.length
+   ?`<table><tr><th>Date</th><th>Focused</th><th>Status</th></tr>${u.sessions.slice(0,5).map(s=>`<tr><td>${new Date(s.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</td><td>${Math.round(s.done/60)} of ${Math.round(s.planned/60)} min</td><td><span class="pill ${s.early?'warn':'ok'}">${s.early?'Ended early':'Completed'}</span></td></tr>`).join('')}</table>`
+   :`<p class="mut">No sessions yet. Start one above.</p>`}</div>`;
+}
+function focusBar(){
+  const u=me(),left=Math.max(0,Math.ceil((u.fa.end-Date.now())/1000));
+  return `<div class="fbar"><b>Focus session</b><span class="t" id="ft">${fmt(left)}</span><div class="p"><i id="fbar" style="width:${100-left/u.fa.planned*100}%"></i></div><button class="emg" data-act="fend">End session</button></div>`;
+}
+function startTick(){
+  clearInterval(tick);
+  tick=setInterval(()=>{
+    const u=me();
+    if(!u||!u.fa){clearInterval(tick);return}
+    const left=Math.ceil((u.fa.end-Date.now())/1000);
+    if(left<=0){fdone(false);return}
+    const t=$('#ft'),b=$('#fbar');
+    if(t)t.textContent=fmt(left);
+    if(b)b.style.width=(100-left/u.fa.planned*100)+'%';
+  },500);
+}
+function fdone(early){
+  const u=me();if(!u||!u.fa)return;
+  const a=u.fa,el=early?Math.min(a.planned,Math.round((Date.now()-a.start)/1000)):a.planned;
+  u.sessions.unshift({ts:a.start,planned:a.planned,done:el,early});
+  u.sessions=u.sessions.slice(0,30);u.fa=null;u.last=Date.now();save();
+  clearInterval(tick);S.emg=false;
+  toast(early?'Session ended':'Session complete. Well done!');render();
+}
+
+/* ---------- quiz & progress ---------- */
+function quiz(){
+  const u=me(),z=S.qz;
+  if(!z){
+    const l=pub();
+    return `<h2>Quiz & Assessment</h2>${l.length?`<div class="grid">${l.map(q=>{const t=u.results.some(r=>r.qid===q.id);return `<button class="tile" data-act="startq" data-id="${q.id}"><span class="pill">${esc(sname(q.subject))}</span>${t?` <span class="pill ok">Best ${best(u,q.id)}%</span>`:''}<b style="margin-top:8px">${esc(q.title)}</b><span class="mut sm">${q.questions.length} questions</span></button>`}).join('')}</div>`:`<div class="card"><p class="mut">No quizzes are published yet. Check back soon, or ask AI Teacher to explain a topic.</p></div>`}`;
+  }
+  const q=DB.quizzes.find(x=>x.id===z.id);
+  if(!q){S.qz=null;return quiz()}
+  const n=q.questions.length;
+  if(z.done){
+    const p=Math.round(z.score/n*100);
+    return `<h2>Quiz result</h2><div class="card" style="text-align:center"><div class="stat">${z.score}/${n}</div><p class="mut" style="margin:6px 0 14px">${p>=80?'Great work.':p>=50?'Good effort. Review the missed topics with AI Teacher.':'Keep practising. Ask AI Teacher to explain the basics.'}</p><div class="row" style="justify-content:center"><button class="btn" data-act="startq" data-id="${q.id}">Retry quiz</button><button class="btn ghost" data-act="qexit">All quizzes</button></div></div>`;
+  }
+  const c=q.questions[z.i];
+  return `<h2>${esc(q.title)}</h2><div class="card">
+  <div class="row between" style="margin-bottom:8px"><span class="mut sm">Question ${z.i+1} of ${n}</span><span class="pill">${esc(sname(q.subject))}</span></div>
+  <div class="bar" style="margin-bottom:16px"><i style="width:${z.i/n*100}%"></i></div>
+  <h3 style="margin-bottom:12px">${esc(c.q)}</h3>
+  ${c.o.map((o,k)=>{
+    let cl='opt';
+    if(z.checked){if(k===c.a)cl+=' right';else if(k===z.sel)cl+=' wrong'}
+    else if(k===z.sel)cl+=' sel';
+    return `<button class="${cl}" data-act="pick" data-k="${k}">${esc(o)}</button>`}).join('')}
+  <div class="row" style="margin-top:12px">${z.checked
+    ?`<button class="btn" data-act="next">${z.i+1<n?'Next question':'Finish quiz'}</button>`
+    :`<button class="btn" data-act="check" ${z.sel===null?'disabled':''}>Check answer</button>`}
+  <button class="btn ghost" data-act="qexit">Quit</button></div></div>`;
+}
+function prog(){
+  const u=me();
+  return `<h2>Progress</h2>
+  <div class="card hero">${gauge(overall(u))}<div><h3>Overall progress</h3><p class="mut">Average across all subjects. Your admin can see this progress.</p></div></div>
+  <div class="grid" style="margin-bottom:14px">
+   <div class="card" style="margin:0"><div class="stat">${u.results.length}</div><div class="mut sm">Quizzes taken</div></div>
+   <div class="card" style="margin:0"><div class="stat">${u.results.length?avgScore(u)+'%':'–'}</div><div class="mut sm">Average quiz score</div></div>
+   <div class="card" style="margin:0"><div class="stat">${fToday(u)}</div><div class="mut sm">Focus minutes today</div></div>
+  </div>
+  <div class="card"><h3>Subjects</h3>${subBars(u)}</div>
+  <div class="card"><h3>Quiz history</h3>${u.results.length
+   ?`<div style="overflow-x:auto"><table><tr><th>Quiz</th><th>Score</th><th>Date</th></tr>${u.results.slice(0,15).map(r=>`<tr><td>${esc(r.title)}</td><td>${r.score}/${r.total}</td><td>${esc(r.date)}</td></tr>`).join('')}</table></div>`
+   :`<p class="mut">No quizzes yet. Take one from the Quiz tab.</p>`}</div>`;
+}
+
+function learn(){
+  const u=me(),sid=S.lsub;
+  if(!sid)return `<h2>Learn</h2><div class="grid">${SUBJ.map(s=>{const n=CUR[s[0]].length,d=dcount(u,s[0]);return `<button class="tile" data-act="lsub" data-s="${s[0]}"><b>${esc(s[1])}</b><span class="mut sm">${n} topics, ${d} completed</span><div style="margin-top:10px">${bar2(Math.round(d/n*100))}</div></button>`}).join('')}</div>`;
+  const t=tps(sid),i=S.ltopic;
+  if(i===null)return `<button class="link" style="margin-bottom:10px" data-act="lback">All subjects</button><h2>${esc(sname(sid))}</h2><p class="mut" style="margin:-6px 0 14px">${dcount(u,sid)} of ${t.length} topics completed. Work through them in order.</p>${t.map((e,k)=>`<button class="opt" data-act="ltop" data-i="${k}"><span class="row between"><span>${k+1}. ${esc(e[2])}</span>${isDone(u,dkey(sid,e[2]))?'<span class="pill ok">Completed</span>':''}</span></button>`).join('')}`;
+  const e=t[i],dn=isDone(u,dkey(sid,e[2]));
+  return `<button class="link" style="margin-bottom:10px" data-act="lback">Back to ${esc(sname(sid))}</button>
+  <h2>${esc(e[2])}</h2><p class="mut sm" style="margin:-6px 0 12px">Topic ${i+1} of ${t.length}</p>
+  <div class="card lesson">${fmtMsg(e[3])}</div>
+  <div class="row"><button class="btn ${dn?'ghost':''}" data-act="ldone">${dn?'Completed. Undo':'Mark as completed'}</button><button class="btn ghost" data-act="lask">Ask AI Teacher</button></div>
+  <div class="row between" style="margin-top:14px">${i>0?`<button class="btn sm ghost" data-act="ltop" data-i="${i-1}">Previous topic</button>`:'<span></span>'}${i<t.length-1?`<button class="btn sm" data-act="ltop" data-i="${i+1}">Next topic</button>`:'<span></span>'}</div>`;
+}
+
+/* ---------- admin ---------- */
+const ANAV=[['overview','Overview'],['students','Students'],['quizzes','Quizzes'],['notices','Notices']];
+function admin(){
+  loadDB();
+  const v={overview:aOverview,students:aStudents,quizzes:aQuizzes,notices:aNotices}[S.adm]();
+  return head('EduBridge Admin')+nav(ANAV,S.adm,'anav')+`<main class="wrap">${v}</main>`;
+}
+function aOverview(){
+  const us=Object.values(DB.users),day=864e5,all=us.flatMap(u=>u.results);
+  const avg=all.length?Math.round(all.reduce((a,r)=>a+r.score/r.total*100,0)/all.length):null;
+  const att=us.map(u=>{
+    const r=[];
+    if(!u.results.length){if(Date.now()-u.created>day)r.push('No quiz taken yet')}
+    else if(avgScore(u)<50)r.push('Average score '+avgScore(u)+'%');
+    if(Date.now()-u.last>3*day)r.push('Inactive for '+Math.floor((Date.now()-u.last)/day)+' days');
+    return [u,r];
+  }).filter(x=>x[1].length);
+  return `<h2>Admin overview</h2>
+  <div class="grid" style="margin-bottom:14px">
+   <div class="card" style="margin:0"><div class="stat">${us.length}</div><div class="mut sm">Registered students</div></div>
+   <div class="card" style="margin:0"><div class="stat">${us.filter(u=>Date.now()-u.last<day).length}</div><div class="mut sm">Active in the last 24 hours</div></div>
+   <div class="card" style="margin:0"><div class="stat">${avg===null?'–':avg+'%'}</div><div class="mut sm">Average quiz score</div></div>
+   <div class="card" style="margin:0"><div class="stat">${pub().length}</div><div class="mut sm">Published quizzes</div></div>
+  </div>
+  <div class="card"><h3>Needs attention</h3>${att.length?att.slice(0,6).map(([u,r])=>`<div class="notice"><div class="row between"><div><b>${esc(u.name)}</b><div class="sm">${r.join('. ')}</div></div><button class="btn sm ghost" data-act="view" data-u="${esc(u.un)}">View</button></div></div>`).join(''):`<p class="mut">${us.length?'Everyone is on track.':'No students yet. They appear here after they create an account.'}</p>`}</div>
+  <div class="card"><h3>Publish to students</h3><p class="mut" style="margin-bottom:12px">Anything you publish appears in the student portal straight away.</p>
+   <div class="row"><button class="btn" data-act="newq">Create a quiz</button><button class="btn ghost" data-act="anav" data-v="notices">Post a notice</button><button class="btn ghost" data-act="preview">Preview student portal</button></div></div>`;
+}
+function aStudents(){
+  if(S.sel)return aDetail();
+  const us=Object.values(DB.users).sort((a,b)=>b.last-a.last);
+  return `<h2>Students</h2><div class="card">${us.length?`<div style="overflow-x:auto"><table><tr><th>Student</th><th>Quizzes</th><th>Avg score</th><th style="min-width:130px">Progress</th><th>Focus today</th><th>Last active</th><th></th></tr>${us.map(u=>`<tr><td><b>${esc(u.name)}</b><div class="mut sm">@${esc(u.un)}</div></td><td>${u.results.length}</td><td>${u.results.length?avgScore(u)+'%':'–'}</td><td><div class="row" style="flex-wrap:nowrap;gap:8px"><div style="flex:1">${bar(overall(u))}</div><span class="sm">${overall(u)}%</span></div></td><td>${fToday(u)} min</td><td class="mut">${ago(u.last)}</td><td><button class="btn sm ghost" data-act="view" data-u="${esc(u.un)}">View</button></td></tr>`).join('')}</table></div>`:`<p class="mut">No students yet. They appear here after they create an account.</p>`}</div>`;
+}
+function aDetail(){
+  const u=DB.users[S.sel];
+  if(!u){S.sel=null;return aStudents()}
+  const qs=u.chat.filter(m=>m.who==='me').slice(-5).reverse();
+  return `<button class="link" style="margin-bottom:10px" data-act="selback">Back to students</button>
+  <h2>${esc(u.name)} <span class="mut sm">@${esc(u.un)}</span></h2>
+  <div class="grid" style="margin-bottom:14px">
+   <div class="card" style="margin:0"><div class="stat">${overall(u)}%</div><div class="mut sm">Overall progress</div></div>
+   <div class="card" style="margin:0"><div class="stat">${u.results.length}</div><div class="mut sm">Quizzes taken</div></div>
+   <div class="card" style="margin:0"><div class="stat">${u.results.length?avgScore(u)+'%':'–'}</div><div class="mut sm">Average score</div></div>
+   <div class="card" style="margin:0"><div class="stat">${fToday(u)}</div><div class="mut sm">Focus minutes today</div></div>
+  </div>
+  <p class="mut sm" style="margin-bottom:14px">Last active: ${ago(u.last)}. Joined ${new Date(u.created).toLocaleDateString('en-US',{month:'short',day:'numeric'})}.</p>
+  <div class="card"><h3>Subject progress</h3>${subBars(u)}</div>
+  <div class="card"><h3>Course topics completed</h3><div class="row">${SUBJ.map(s=>`<span class="pill ${dcount(u,s[0])===CUR[s[0]].length?'ok':''}">${s[2]} ${dcount(u,s[0])}/${CUR[s[0]].length}</span>`).join('')}</div></div>
+  <div class="card"><h3>Quiz history</h3>${u.results.length?`<div style="overflow-x:auto"><table><tr><th>Quiz</th><th>Subject</th><th>Score</th><th>Date</th></tr>${u.results.slice(0,15).map(r=>`<tr><td>${esc(r.title)}</td><td>${esc(sname(r.subject))}</td><td>${r.score}/${r.total}</td><td>${esc(r.date)}</td></tr>`).join('')}</table></div>`:`<p class="mut">No quizzes taken yet.</p>`}</div>
+  <div class="card"><h3>Focus sessions</h3>${u.sessions.length?`<table><tr><th>Date</th><th>Focused</th><th>Status</th></tr>${u.sessions.slice(0,8).map(s=>`<tr><td>${new Date(s.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</td><td>${Math.round(s.done/60)} of ${Math.round(s.planned/60)} min</td><td><span class="pill ${s.early?'warn':'ok'}">${s.early?'Ended early':'Completed'}</span></td></tr>`).join('')}</table>`:`<p class="mut">No focus sessions yet.</p>`}</div>
+  <div class="card"><h3>AI Teacher</h3><p class="mut" style="margin-bottom:8px">${u.asked||0} questions asked.</p>${qs.length?qs.map(m=>`<div class="notice"><div class="sm">${esc(m.text)}</div></div>`).join(''):''}</div>
+  <div class="card"><h3>Account</h3>${S.rm===u.un
+   ?`<p class="mut" style="margin-bottom:10px">Remove ${esc(u.name)} and all of their progress? This cannot be undone.</p><div class="row"><button class="btn ghost bad" data-act="rmyes">Yes, remove</button><button class="btn ghost" data-act="rmno">Cancel</button></div>`
+   :`<button class="btn ghost bad sm" data-act="rmask">Remove account</button>`}</div>`;
+}
+const qblock=()=>{const n=++qn;return `<div class="qb"><div class="row between"><b class="sm">Question</b><button class="link sm" style="color:var(--bad)" data-act="rmq">Remove</button></div><input class="qq" placeholder="Question text">${[0,1,2,3].map(i=>`<div class="o"><input type="radio" name="c${n}" value="${i}" ${i===0?'checked':''} aria-label="Mark option ${i+1} as correct"><input type="text" class="qo" placeholder="Option ${i+1}"></div>`).join('')}<p class="mut sm" style="margin-top:6px">Select the circle next to the correct option.</p></div>`};
+function aQuizzes(){
+  if(S.builder)return `<h2>New quiz</h2><div class="card">
+   <label>Title<input id="qt" placeholder="e.g. Sorting algorithms"></label>
+   <label>Subject<select id="qs">${SUBJ.map(s=>`<option value="${s[0]}">${esc(s[1])}</option>`).join('')}</select></label>
+   <div id="qbs">${qblock()}</div>
+   <button class="btn ghost sm" data-act="addq">Add question</button>
+   <p class="err" id="qerr" style="margin-top:10px"></p>
+   <div class="row"><button class="btn" data-act="saveq" data-pub="1">Publish quiz</button><button class="btn ghost" data-act="saveq" data-pub="0">Save as draft</button><button class="btn ghost" data-act="cancelq">Cancel</button></div></div>`;
+  return `<div class="row between" style="margin-bottom:14px"><h2 style="margin:0">Quizzes</h2><button class="btn" data-act="newq">New quiz</button></div>
+  <div class="card">${DB.quizzes.length?`<div style="overflow-x:auto"><table><tr><th>Title</th><th>Subject</th><th>Questions</th><th>Status</th><th></th></tr>${DB.quizzes.map(q=>`<tr><td><b>${esc(q.title)}</b></td><td>${esc(sname(q.subject))}</td><td>${q.questions.length}</td><td><span class="pill ${q.published?'ok':''}">${q.published?'Published':'Draft'}</span></td><td><div class="row" style="flex-wrap:nowrap"><button class="btn sm ghost" data-act="tpub" data-id="${q.id}">${q.published?'Unpublish':'Publish'}</button><button class="btn sm ghost bad" data-act="delq" data-id="${q.id}">Delete</button></div></td></tr>`).join('')}</table></div>`:`<p class="mut">No quizzes yet. Create one and publish it to your students.</p>`}</div>`;
+}
+function aNotices(){
+  return `<h2>Notices</h2>
+  <div class="card"><h3>New notice</h3>
+   <label>Title<input id="nt" placeholder="e.g. Lab test on Friday"></label>
+   <label>Message<textarea id="nb" rows="3" placeholder="What should students know?"></textarea></label>
+   <p class="err" id="nerr"></p>
+   <button class="btn" data-act="addn">Publish notice</button></div>
+  <div class="card"><h3>All notices</h3>${DB.notices.length?DB.notices.map(n=>`<div class="notice"><div class="row between"><b>${esc(n.title)}</b><span class="pill ${n.published?'ok':''}">${n.published?'Published':'Hidden'}</span></div><div class="sm">${esc(n.body)}</div><div class="row" style="margin-top:8px"><span class="mut sm">${esc(n.date)}</span><button class="btn sm ghost" data-act="tn" data-id="${n.id}">${n.published?'Hide':'Publish'}</button><button class="btn sm ghost bad" data-act="deln" data-id="${n.id}">Delete</button></div></div>`).join(''):`<p class="mut">No notices yet.</p>`}</div>`;
+}
+
+/* ---------- actions ---------- */
+function render(){
+  $('#app').innerHTML=!S.role?auth():S.role==='admin'?admin():student();
+  if(S.role==='student'&&S.view==='teacher'){const c=$('#chat');if(c)c.scrollTop=c.scrollHeight}
+}
+const go=()=>{window.scrollTo(0,0);render()};
+const H={
+  auth:d=>{S.auth=d.m;S.err='';S.ok='';render()},
+  signup(){
+    const n=$('#sn').value.trim(),un=$('#su').value.trim().toLowerCase(),p=$('#sp').value,c=$('#sc').value;
+    if(n.length<2)return fail('Enter your full name.');
+    if(!/^[a-z0-9_]{3,20}$/.test(un))return fail('Username must be 3 to 20 letters, numbers or underscores.');
+    if(un==='admin'||DB.users[un])return fail('That username is taken. Choose another.');
+    if(!strong(p))return fail('Password is not strong enough. Meet every rule in the list.');
+    if(p.toLowerCase().includes(un))return fail('Password cannot contain your username.');
+    if(p!==c)return fail('Passwords do not match.');
+    DB.users[un]=newUser(n,un,sha256('eb-user|'+un+'|'+p));save();
+    S.auth='signin';S.pre=un;S.ok='Account created. Sign in with your username and password.';S.err='';render();
+  },
+  login(){
+    const now=Date.now(),un=$('#u').value.trim().toLowerCase(),p=$('#p').value,ad=S.auth==='admin';
+    if(now<S.lockUntil)return fail('Too many attempts. Try again in '+Math.ceil((S.lockUntil-now)/1000)+' seconds.');
+    if(!un||!p)return fail('Enter your username and password.');
+    const ok=ad?(un==='admin'&&sha256('eb-admin|admin|'+p)===AH):(DB.users[un]&&sha256('eb-user|'+un+'|'+p)===DB.users[un].hash);
+    if(!ok){
+      if(++S.fails>=5){S.fails=0;S.lockUntil=now+30000;return fail('Too many attempts. Wait 30 seconds.')}
+      return fail('Incorrect username or password.');
+    }
+    S.fails=0;S.err='';S.ok='';S.pre='';
+    if(ad){S.role='admin';S.user='admin';S.adm='overview';S.sel=null}
+    else{
+      S.role='student';S.user=un;S.view='dash';S.lsub=null;S.ltopic=null;S.qz=null;S.emg=false;S.typing=false;
+      const u=me();touch(u);
+      if(u.fa){if(Date.now()>=u.fa.end)fdone(false);else startTick()}
+    }
+    go();
+  },
+  logout(){clearInterval(tick);S.role=null;S.prev=false;S.qz=null;S.builder=false;S.emg=false;S.err='';S.ok='';S.auth=Object.keys(DB.users).length?'signin':'signup';render()},
+  nav:d=>{
+    if(d.v==='quiz'&&S.qz&&S.qz.done)S.qz=null;S.view=d.v;go();
+  },
+  anav:d=>{S.adm=d.v;S.builder=false;S.sel=null;go()},
+  preview:()=>{S.prev=true;S.demo=newUser('Preview','preview','');S.role='student';S.view='dash';S.qz=null;go()},
+  back:()=>{clearInterval(tick);S.prev=false;S.demo=null;S.role='admin';S.qz=null;go()},
+  tsub:d=>{S.tsub=d.s;render()},
+  ask:d=>ask(d.q),
+  send:()=>ask($('#msg').value),
+  fpre:d=>{S.fmin=+d.m;render()},
+  fstart(){
+    const u=me(),now=Date.now();
+    u.fa={start:now,end:now+S.fmin*60000,planned:S.fmin*60};save();
+    startTick();toast('Focus timer started');go();
+  },
+  fend:()=>fdone(true),
+  lsub:d=>{S.lsub=d.s;S.ltopic=null;go()},
+  ltop:d=>{S.ltopic=+d.i;go()},
+  lback:()=>{if(S.ltopic!==null)S.ltopic=null;else S.lsub=null;go()},
+  topen:d=>{S.view='learn';S.lsub=d.s;S.ltopic=+d.i;go()},
+  lask:()=>{S.tsub=S.lsub;S.view='teacher';go()},
+  ldone(){
+    const u=me(),k=dkey(S.lsub,tps(S.lsub)[S.ltopic][2]);u.done=u.done||[];
+    const i=u.done.indexOf(k);
+    if(i<0){u.done.push(k);toast('Marked as completed')}else{u.done.splice(i,1);toast('Marked as not completed')}
+    touch(u);render();
+  },
+  startq:d=>{S.qz={id:+d.id,i:0,sel:null,checked:false,score:0,done:false};S.view='quiz';go()},
+  pick:d=>{if(S.qz&&!S.qz.checked){S.qz.sel=+d.k;render()}},
+  check(){
+    const z=S.qz,q=DB.quizzes.find(x=>x.id===z.id);
+    z.checked=true;if(z.sel===q.questions[z.i].a)z.score++;render();
+  },
+  next(){
+    const z=S.qz,q=DB.quizzes.find(x=>x.id===z.id),n=q.questions.length;
+    if(z.i+1<n){z.i++;z.sel=null;z.checked=false}
+    else{
+      z.done=true;const u=me();
+      u.results.unshift({qid:q.id,title:q.title,subject:q.subject,score:z.score,total:n,date:today(),ts:Date.now()});
+      u.results=u.results.slice(0,100);touch(u);
+    }
+    go();
+  },
+  qexit:()=>{S.qz=null;go()},
+  view:d=>{S.adm='students';S.sel=d.u;S.rm=null;go()},
+  selback:()=>{S.sel=null;S.rm=null;go()},
+  rmask:()=>{S.rm=S.sel;render()},
+  rmno:()=>{S.rm=null;render()},
+  rmyes:()=>{delete DB.users[S.sel];S.sel=null;S.rm=null;save();toast('Account removed');go()},
+  newq:()=>{S.adm='quizzes';S.builder=true;go()},
+  cancelq:()=>{S.builder=false;go()},
+  addq:()=>$('#qbs').insertAdjacentHTML('beforeend',qblock()),
+  rmq:(d,b)=>b.closest('.qb').remove(),
+  saveq(d){
+    const t=$('#qt').value.trim(),blocks=[...document.querySelectorAll('.qb')],er=$('#qerr');
+    if(!t){er.textContent='Add a quiz title.';return}
+    if(!blocks.length){er.textContent='Add at least one question.';return}
+    const qs=[];
+    for(const b of blocks){
+      const q=b.querySelector('.qq').value.trim(),o=[...b.querySelectorAll('.qo')].map(x=>x.value.trim());
+      if(!q||o.some(x=>!x)){er.textContent='Fill in every question and all four options.';return}
+      qs.push({q,o,a:+b.querySelector('input[type=radio]:checked').value});
+    }
+    DB.quizzes.push({id:++DB.uid,subject:$('#qs').value,title:t,published:d.pub==='1',questions:qs});
+    S.builder=false;save();toast(d.pub==='1'?'Published':'Saved as draft');go();
+  },
+  tpub:d=>{const q=DB.quizzes.find(x=>x.id===+d.id);q.published=!q.published;save();toast(q.published?'Published':'Unpublished');render()},
+  delq:d=>{DB.quizzes=DB.quizzes.filter(x=>x.id!==+d.id);save();toast('Deleted');render()},
+  addn(){
+    const t=$('#nt').value.trim(),b=$('#nb').value.trim();
+    if(!t||!b){$('#nerr').textContent='Add a title and a message.';return}
+    DB.notices.unshift({id:++DB.uid,title:t,body:b,published:true,date:today()});
+    save();toast('Published');render();
+  },
+  tn:d=>{const n=DB.notices.find(x=>x.id===+d.id);n.published=!n.published;save();toast(n.published?'Published':'Hidden');render()},
+  deln:d=>{DB.notices=DB.notices.filter(x=>x.id!==+d.id);save();toast('Deleted');render()}
+};
+$('#app').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');
+  if(!b||b.disabled)return;
+  const f=H[b.dataset.act];if(f)f(b.dataset,b);
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='sp'){const r=$('#rules');if(r)r.innerHTML=rules(e.target.value)}
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const id=e.target.id;
+  if(id==='u'||id==='p')H.login();
+  else if(id==='sn'||id==='su'||id==='sp'||id==='sc')H.signup();
+  else if(id==='msg')H.send();
+});
+render();
+</script>
+</body>
+</html>
